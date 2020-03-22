@@ -1,0 +1,596 @@
+<Document>
+<Version> 22 </Version>
+<JMadonnaVersion> 9.1.19 </JMadonnaVersion>
+<Bounds> 0 0 1366 723 </Bounds>
+<NotesEditor>
+<jeditorpane>
+<size>13</size><family>Lucida Grande</family>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</jeditorpane>
+</NotesEditor>
+<jmadonna.EquationPanel>
+<DocPanel>
+</DocPanel>
+<jeditorpane>
+<size>20</size><family>Serif</family>;Model for Metro Manila (using Berkeley Madonna for Mac ver.9.1.19)
+
+METHOD RK4
+
+STARTTIME = 0
+STOPTIME = 200
+DT = 0.01
+
+run = 1 ;up to 1000 or more runs
+
+;compartmental model equations (S-E-I-Is-R-S)
+d/dt (S) = -beta*I*S/N + rho*R + connections ;adding connections (can also be connections*S)
+d/dt (E) = beta*I*S/N - alpha*E
+d/dt (I) = alpha*E - gamma*I - iso*I - death*I + import
+d/dt (Is) = iso*I - gamma2*Is - deathIsr*Is
+d/dt (R) = gamma*I - rho*R + gamma2*Is
+
+;for counting
+d/dt (deathI) = death*I+deathIsr*Is
+d/dt (deathIs) = deathIsr*Is
+d/dt (totI) = alpha*E ;includes reinfection
+d/dt (totIs) = iso*I
+N = S+E+I+R+1
+limit S<gt>=0
+limit E<gt>=0
+limit I<gt>=0
+limit Is<gt>=0
+limit R<gt>=0
+
+;initialization
+init S = S0
+S0 = RANDOM(8000,13000) ;not all are well-connected (this is to consider that social networks have clusters; can be based on number of barangays in Metro Manila or on the data from other countries)
+connections = RANDOM(1,100) ;can be increased more
+init E = 0
+init I = I0
+I0 = Normal(15,1) ; you can change this to Normal(1,1)
+limit I0<gt>=1
+init R = 0
+init Is = 0
+init deathI = 0
+init totI = I0
+init deathIs = 0
+init totIs = 0
+
+;parameters (calibrated based on local reported cases and on global values)
+import = 0.1
+
+isolate = 0.02 ;with slider
+iso = Normal(isolate,0.05*isolate)
+limit iso<gt>=0
+
+beta = (R0/tau)*(S0+I0)/S0
+
+R0 = Normal(3,0.5)*flat
+;postR = 3
+;R0 = if TIME<lt>35 THEN Normal(3,0.5) else (if TIME<lt>=65 THEN Normal(1,0.5) ELSE Normal(postR,0.5))
+limit R0<gt>=0.9 ;can be modified
+;limit R0<lt>=4 ;can be modified
+d/dt (flat) = -ratef*flat
+init flat = 1 
+ratef = 0 ;with slider
+
+tau = Normal(14,3)
+limit tau<gt>=1
+
+alpha = Normal(10/14,10/14*0.1)
+limit alpha<gt>=0
+limit alpha<lt>=1
+
+gamma = Normal(0.96/14,0.96/14*0.1) - iso
+limit gamma<gt>=0
+limit gamma<lt>=1
+
+gamma2 = Normal(0.95/14,0.95/14*0.1)
+limit gamma2<gt>=0
+limit gamma2<lt>=1
+
+rho = Normal(0.1/30,0.1/30*0.1)
+limit rho<gt>=0
+limit rho<lt>=1
+
+death = Normal(0.02/14,0.02/14*0.1)
+limit death<gt>=0
+limit death<lt>=1
+
+deathIsr = Normal(0.03/14,0.03/14*0.1)
+limit deathIsr<gt>=0
+limit deathIsr<lt>=1
+
+;other outputs
+cfr = deathI/(totI+1) ;infection fatality ratio
+cfrs = deathI/(totIs+1) ;case fatality ratio
+detection = totIs/(totI+1) ;detection ratio
+
+perday_death = death*I+deathIsr*Is
+perday_infected = alpha*E
+perday_isolated = iso*I<size>12</size>
+
+
+
+
+
+
+
+
+
+
+
+</jeditorpane>
+</jmadonna.EquationPanel>
+
+<imethod> rk4 </imethod>
+<Param> ratef 0.0030 </Param>
+<Sliders>
+<SliderInfo>
+<name> isolate </name>
+<default> 0.02 </default>
+<min> 0.0 </min>
+<max> 1.0 </max>
+<inc> 0.0010 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> ratef </name>
+<default> 0.0030 </default>
+<min> 0.0 </min>
+<max> 1.0 </max>
+<inc> 0.0010 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> flat </name>
+<default> 1.0 </default>
+<min> 0.0 </min>
+<max> 1.0 </max>
+<inc> 0.01 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+</Sliders>
+<jmadonna.ParameterPanel>
+<DocPanel>
+</DocPanel>
+<ParamSets>
+</ParamSets>
+</jmadonna.ParameterPanel>
+<jmadonna.MultiPanel>
+<DocPanel>
+</DocPanel>
+<DividerPercent> 1.0 </DividerPercent>
+<Orientation> -1 </Orientation>
+<idx> 0 </idx>
+<TabSplitter>
+<SelectedIndex> 0 </SelectedIndex>
+<graph.COutputFrame>
+<DocPanel>
+<Name>
+Graph 1
+</Name>
+</DocPanel>
+<slidersVisible> true </slidersVisible>
+
+<SingleView>
+<graph.COutputView>
+<Name> Graph </Name>
+<GraphToolBar>
+<Legend> 1 </Legend>
+</GraphToolBar>
+<Plot>
+<LineWidth> 3 </LineWidth>
+<MovableLegend>
+<Bounds> 427 144 111 28 </Bounds>
+<opaque> true </opaque>
+<Color> 255 255 255 </Color>
+<border> true </border>
+</MovableLegend>
+</Plot>
+<OV_XVAR>
+<VI_SYMBOL> TIME </VI_SYMBOL>
+</OV_XVAR>
+<OV_YVARS>
+<OV_YVAR_I>
+<VI_SYMBOL> S </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> E </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> I </VI_SYMBOL>
+<VI_SHOW> true </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> R </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> beta </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> N </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> R0 </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> tau </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> alpha </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> gamma </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> rho </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> S0 </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> I0 </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> Is </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> iso </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> flat </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> death </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> deathI </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> totI </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> cfr </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> totIs </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> detection </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> cfrs </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> perday_infected </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> perday_death </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> perday_isolated </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+</OV_YVARS>
+<OV_TABLE> false </OV_TABLE>
+<OV_FFT> false </OV_FFT>
+<OV_COLORS> true </OV_COLORS>
+<OV_STYLES> false </OV_STYLES>
+<OV_OSCMODE> false </OV_OSCMODE>
+<OV_LINES> true </OV_LINES>
+<OV_POINTS> false </OV_POINTS>
+<OV_GRID> false </OV_GRID>
+<OV_DBTN> true </OV_DBTN>
+<OV_LEGEND> true </OV_LEGEND>
+<OV_PARAMS> false </OV_PARAMS>
+<OV_READOUT> false </OV_READOUT>
+<OV_INITCOND> false </OV_INITCOND>
+<OV_RDOUTFXFY> 0.0 0.0 </OV_RDOUTFXFY>
+<OV_ZSNORMAL>
+</OV_ZSNORMAL>
+<OV_ZSFFT>
+<ZS_SIZE> 1 </ZS_SIZE>
+<ZS_I>
+<ZS_XLOG> true </ZS_XLOG>
+<ZS_Y1LOG> false </ZS_Y1LOG>
+<ZS_Y2LOG> false </ZS_Y2LOG>
+</ZS_I>
+</OV_ZSFFT>
+<OV_ZSOSCMODE>
+</OV_ZSOSCMODE>
+<OV_AUTOLABEL> 0 0 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 1 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 2 1 </OV_AUTOLABEL>
+<OV_X1LABELS>                            DAY              </OV_X1LABELS>
+<OV_Y1LABELS>  I </OV_Y1LABELS>
+<OV_Y2LABELS>   </OV_Y2LABELS>
+<OV_LEGENDXY> 0.30000001192092896 0.5 </OV_LEGENDXY>
+<OV_PARAMSXY> 0.30000001192092896 0.5 </OV_PARAMSXY>
+<OV_COLORTABLE> 0 <OV_COLORTABLE>
+</graph.COutputView>
+</SingleView>
+</graph.COutputFrame>
+<graph.COutputFrame>
+<DocPanel>
+<Name>
+Parameter Plot...
+</Name>
+</DocPanel>
+<ivar> S0 </ivar>
+<paramGraph>
+<nRuns> 101 </nRuns>
+<initValue> 0.0 </initValue>
+<finalValue> 1.0  </finalValue>
+<isArithmetic> 1 </isArithmetic>
+<selectedParam> import </selectedParam>
+<yvarmodel> !12!@3@#2#$%$ </yvarmodel>
+</paramGraph>
+<slidersVisible> true </slidersVisible>
+
+<SingleView>
+<graph.COutputView>
+<Name> Graph </Name>
+<GraphToolBar>
+<Grid> 1 </Grid>
+</GraphToolBar>
+<Plot>
+<LineWidth> 3 </LineWidth>
+</Plot>
+<OV_TABLE> false </OV_TABLE>
+<OV_FFT> false </OV_FFT>
+<OV_COLORS> true </OV_COLORS>
+<OV_STYLES> false </OV_STYLES>
+<OV_OSCMODE> false </OV_OSCMODE>
+<OV_LINES> true </OV_LINES>
+<OV_POINTS> false </OV_POINTS>
+<OV_GRID> true </OV_GRID>
+<OV_DBTN> true </OV_DBTN>
+<OV_LEGEND> false </OV_LEGEND>
+<OV_PARAMS> false </OV_PARAMS>
+<OV_READOUT> false </OV_READOUT>
+<OV_INITCOND> false </OV_INITCOND>
+<OV_RDOUTFXFY> 0.0 0.0 </OV_RDOUTFXFY>
+<OV_ZSNORMAL>
+</OV_ZSNORMAL>
+<OV_ZSFFT>
+<ZS_SIZE> 1 </ZS_SIZE>
+<ZS_I>
+<ZS_XLOG> true </ZS_XLOG>
+<ZS_Y1LOG> false </ZS_Y1LOG>
+<ZS_Y2LOG> false </ZS_Y2LOG>
+</ZS_I>
+</OV_ZSFFT>
+<OV_ZSOSCMODE>
+</OV_ZSOSCMODE>
+<OV_AUTOLABEL> 0 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 1 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 2 1 </OV_AUTOLABEL>
+<OV_X1LABELS>  INIT S0 </OV_X1LABELS>
+<OV_Y1LABELS>   </OV_Y1LABELS>
+<OV_Y2LABELS>   </OV_Y2LABELS>
+<OV_LEGENDXY> 0.30000001192092896 0.5 </OV_LEGENDXY>
+<OV_PARAMSXY> 0.30000001192092896 0.5 </OV_PARAMSXY>
+<OV_COLORTABLE> 0 <OV_COLORTABLE>
+</graph.COutputView>
+</SingleView>
+</graph.COutputFrame>
+<graph.COutputFrame>
+<DocPanel>
+<Name>
+Parameter Plot...
+</Name>
+</DocPanel>
+<ivar> connections </ivar>
+<paramGraph>
+<nRuns> 101 </nRuns>
+<initValue> 0.0 </initValue>
+<finalValue> 0.5  </finalValue>
+<isArithmetic> 1 </isArithmetic>
+<selectedParam> isolate </selectedParam>
+<yvarmodel> !12!@3@#2#$%$ </yvarmodel>
+</paramGraph>
+<slidersVisible> true </slidersVisible>
+
+<SingleView>
+<graph.COutputView>
+<Name> Graph </Name>
+<GraphToolBar>
+<Grid> 1 </Grid>
+</GraphToolBar>
+<Plot>
+<LineWidth> 3 </LineWidth>
+</Plot>
+<OV_TABLE> false </OV_TABLE>
+<OV_FFT> false </OV_FFT>
+<OV_COLORS> true </OV_COLORS>
+<OV_STYLES> false </OV_STYLES>
+<OV_OSCMODE> false </OV_OSCMODE>
+<OV_LINES> true </OV_LINES>
+<OV_POINTS> false </OV_POINTS>
+<OV_GRID> true </OV_GRID>
+<OV_DBTN> true </OV_DBTN>
+<OV_LEGEND> false </OV_LEGEND>
+<OV_PARAMS> false </OV_PARAMS>
+<OV_READOUT> false </OV_READOUT>
+<OV_INITCOND> false </OV_INITCOND>
+<OV_RDOUTFXFY> 0.0 0.0 </OV_RDOUTFXFY>
+<OV_ZSNORMAL>
+</OV_ZSNORMAL>
+<OV_ZSFFT>
+<ZS_SIZE> 1 </ZS_SIZE>
+<ZS_I>
+<ZS_XLOG> true </ZS_XLOG>
+<ZS_Y1LOG> false </ZS_Y1LOG>
+<ZS_Y2LOG> false </ZS_Y2LOG>
+</ZS_I>
+</OV_ZSFFT>
+<OV_ZSOSCMODE>
+</OV_ZSOSCMODE>
+<OV_AUTOLABEL> 0 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 1 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 2 1 </OV_AUTOLABEL>
+<OV_X1LABELS>  INIT connections </OV_X1LABELS>
+<OV_Y1LABELS>   </OV_Y1LABELS>
+<OV_Y2LABELS>   </OV_Y2LABELS>
+<OV_LEGENDXY> 0.30000001192092896 0.5 </OV_LEGENDXY>
+<OV_PARAMSXY> 0.30000001192092896 0.5 </OV_PARAMSXY>
+<OV_COLORTABLE> 0 <OV_COLORTABLE>
+</graph.COutputView>
+</SingleView>
+</graph.COutputFrame>
+<graph.COutputFrame>
+<DocPanel>
+<Name>
+Parameter Plot...
+</Name>
+</DocPanel>
+<ivar> iso </ivar>
+<paramGraph>
+<nRuns> 101 </nRuns>
+<initValue> 0.0 </initValue>
+<finalValue> 1.0  </finalValue>
+<isArithmetic> 1 </isArithmetic>
+<selectedParam> INIT flat </selectedParam>
+<yvarmodel> !12!@3@#2#$!24!@4@#12#$%$ </yvarmodel>
+</paramGraph>
+<slidersVisible> true </slidersVisible>
+
+<SingleView>
+<graph.COutputView>
+<Name> Graph </Name>
+<GraphToolBar>
+<Grid> 1 </Grid>
+</GraphToolBar>
+<Plot>
+<LineWidth> 3 </LineWidth>
+</Plot>
+<OV_TABLE> false </OV_TABLE>
+<OV_FFT> false </OV_FFT>
+<OV_COLORS> true </OV_COLORS>
+<OV_STYLES> false </OV_STYLES>
+<OV_OSCMODE> false </OV_OSCMODE>
+<OV_LINES> true </OV_LINES>
+<OV_POINTS> false </OV_POINTS>
+<OV_GRID> true </OV_GRID>
+<OV_DBTN> true </OV_DBTN>
+<OV_LEGEND> false </OV_LEGEND>
+<OV_PARAMS> false </OV_PARAMS>
+<OV_READOUT> false </OV_READOUT>
+<OV_INITCOND> false </OV_INITCOND>
+<OV_RDOUTFXFY> 0.0 0.0 </OV_RDOUTFXFY>
+<OV_ZSNORMAL>
+</OV_ZSNORMAL>
+<OV_ZSFFT>
+<ZS_SIZE> 1 </ZS_SIZE>
+<ZS_I>
+<ZS_XLOG> true </ZS_XLOG>
+<ZS_Y1LOG> false </ZS_Y1LOG>
+<ZS_Y2LOG> false </ZS_Y2LOG>
+</ZS_I>
+</OV_ZSFFT>
+<OV_ZSOSCMODE>
+</OV_ZSOSCMODE>
+<OV_AUTOLABEL> 0 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 1 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 2 1 </OV_AUTOLABEL>
+<OV_X1LABELS>  INIT iso </OV_X1LABELS>
+<OV_Y1LABELS>   </OV_Y1LABELS>
+<OV_Y2LABELS>   </OV_Y2LABELS>
+<OV_LEGENDXY> 0.30000001192092896 0.5 </OV_LEGENDXY>
+<OV_PARAMSXY> 0.30000001192092896 0.5 </OV_PARAMSXY>
+<OV_COLORTABLE> 0 <OV_COLORTABLE>
+</graph.COutputView>
+</SingleView>
+</graph.COutputFrame>
+</TabSplitter>
+<idx> 1 </idx>
+<TabSplitter>
+<SelectedIndex> -1 </SelectedIndex>
+</TabSplitter>
+</jmadonna.MultiPanel>
+
+<ChemicalReactionDialog>
+<ShowRates> true </ShowRates>
+<ShowConsts> true </ShowConsts>
+<ShowInits> true </ShowInits>
+<ShowDiffs> true </ShowDiffs>
+</ChemicalReactionDialog>
+</Document>
