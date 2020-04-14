@@ -1,0 +1,612 @@
+<Document>
+<Version> 22 </Version>
+<JMadonnaVersion> 9.1.19 </JMadonnaVersion>
+<Bounds> 0 0 1366 723 </Bounds>
+<dataset>
+<name> #confirmed </name>
+<points> true </points>
+<is2D> 0 </is2D>
+<matrix> 38 2
+ 16.0 4.0
+ 17.0 5.0
+ 18.0 6.0
+ 19.0 8.0
+ 20.0 12.0
+ 21.0 24.0
+ 22.0 33.0
+ 23.0 57.0
+ 24.0 66.0
+ 25.0 97.0
+ 26.0 115.0
+ 27.0 138.0
+ 28.0 179.0
+ 29.0 194.0
+ 30.0 213.0
+ 31.0 213.0
+ 32.0 291.0
+ 33.0 396.0
+ 34.0 541.0
+ 35.0 600.0
+ 36.0 652.0
+ 37.0 1065.0
+ 38.0 1403.0
+ 39.0 1756.0
+ 40.0 2055.0
+ 41.0 2315.0
+ 42.0 2552.0
+ 43.0 2717.0
+ 44.0 2916.0
+ 45.0 3107.0
+ 46.0 3224.0
+ 47.0 3235.0
+ 48.0 3246.0
+ 49.0 3660.0
+ 50.0 3764.0
+ 51.0 3870.0
+ 52.0 4076.0
+ 53.0 4195.0
+</matrix>
+</dataset>
+<dataset>
+<name> #deaths </name>
+<points> true </points>
+<is2D> 0 </is2D>
+<matrix> 38 2
+ 16.0 1.0
+ 17.0 1.0
+ 18.0 1.0
+ 19.0 1.0
+ 20.0 1.0
+ 21.0 1.0
+ 22.0 1.0
+ 23.0 4.0
+ 24.0 7.0
+ 25.0 11.0
+ 26.0 14.0
+ 27.0 18.0
+ 28.0 21.0
+ 29.0 30.0
+ 30.0 34.0
+ 31.0 39.0
+ 32.0 44.0
+ 33.0 53.0
+ 34.0 58.0
+ 35.0 66.0
+ 36.0 70.0
+ 37.0 75.0
+ 38.0 82.0
+ 39.0 86.0
+ 40.0 91.0
+ 41.0 95.0
+ 42.0 96.0
+ 43.0 96.0
+ 44.0 96.0
+ 45.0 107.0
+ 46.0 136.0
+ 47.0 144.0
+ 48.0 152.0
+ 49.0 163.0
+ 50.0 177.0
+ 51.0 182.0
+ 52.0 203.0
+ 53.0 221.0
+</matrix>
+</dataset>
+<dataset>
+<name> #recovered </name>
+<points> true </points>
+<is2D> 0 </is2D>
+<matrix> 38 2
+ 16.0 2.0
+ 17.0 2.0
+ 18.0 2.0
+ 19.0 2.0
+ 20.0 2.0
+ 21.0 2.0
+ 22.0 2.0
+ 23.0 2.0
+ 24.0 2.0
+ 25.0 3.0
+ 26.0 4.0
+ 27.0 7.0
+ 28.0 10.0
+ 29.0 13.0
+ 30.0 15.0
+ 31.0 20.0
+ 32.0 20.0
+ 33.0 26.0
+ 34.0 29.0
+ 35.0 33.0
+ 36.0 36.0
+ 37.0 39.0
+ 38.0 42.0
+ 39.0 43.0
+ 40.0 45.0
+ 41.0 48.0
+ 42.0 49.0
+ 43.0 50.0
+ 44.0 50.0
+ 45.0 51.0
+ 46.0 52.0
+ 47.0 57.0
+ 48.0 64.0
+ 49.0 73.0
+ 50.0 84.0
+ 51.0 96.0
+ 52.0 124.0
+ 53.0 140.0
+</matrix>
+</dataset>
+<NotesEditor>
+<jeditorpane>
+<size>13</size><family>Lucida Grande</family>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</jeditorpane>
+</NotesEditor>
+<jmadonna.EquationPanel>
+<DocPanel>
+</DocPanel>
+<jeditorpane>
+<size>18</size><family>Serif</family>METHOD RK4
+
+STARTTIME = 0
+STOPTIME = 200
+DT = 0.01
+
+connection = 0.001*S0
+
+d/dt (S) = -beta*(I+Asys*0.7+0.05*Is+0.02*isoAsys)*S + rho*R + connection + protecttime*E
+
+protect = 0
+protecttime = if TIME<gt>=timeend then protect else 0.1 
+
+d/dt (E) = beta*(I+Asys*0.7+0.05*Is+0.02*isoAsys)*S - alpha*0.8*E - alpha*0.2*E - protecttime*E
+
+d/dt (Asys) = alpha*0.8*E - gammaA*Asys - isoA
+
+d/dt (isoAsys) = isoA - gammaA*isoAsys
+
+d/dt (I) = alpha*0.2*E - gamma*I - iso  - death*I + import
+
+d/dt (Is) = iso - gammaIs*Is - deathIs*Is + imports ;isolated hospitalized
+
+d/dt (R) = gammaA*Asys + gamma*I - rho*R + gammaIs*Is + gammaA*isoAsys
+
+d/dt (deathI) = death*I + deathIs*Is
+
+d/dt (totI) = alpha*E ;includes reinfection
+
+N = S+E+I+Is+R+Asys+isoAsys+1
+Infected = I+Is+Asys+isoAsys
+init S = S0
+S0 = 800000 ;not all are well-connected
+init E = 0
+init Asys = 0
+init I = I0
+I0 = 15
+init R = 0
+init Is = 0
+init deathI = 0
+init totI = I0
+init isoAsys= 0
+
+import = if TIME<gt>=89 and TIME<lt>=90 then OFW1 else 0.1
+imports = if TIME<gt>=89 and TIME<lt>=90 then OFW else 0
+
+OFW1 = 70000*0.15
+OFW = 70000*0.15
+
+isolateIs = 0.999
+isolateIsP = if TIME<gt>=timeend then isolateIs else 1  
+isolateA = 1-isolateIsP
+isoA = detective_kits*isolateA 
+iso = detective_kits*isolateIsP
+detective_kits = kit ;per day based on surveillance
+kit = 400
+limit iso <lt>= I
+limit isoA <lt>= Asys
+
+beta = (R0/tau)/S0*flat
+
+first = 2.5
+second = 2.5
+;trendthird = sin(0.1*time)/2+1
+trendthird = third
+thirdf = if TIME <gt>= timeend then trendthird else third 
+third = 2.5
+timeend = 75
+
+R0 = if TIME <gt>= 45 and TIME <lt>= timeend then second else if TIME <gt> timeend then thirdf else first
+limit beta<gt>=0
+d/dt (flat) = -ratef*flat
+init flat = 1 
+limit flat<gt>=0
+ratef = 0
+
+tau = 5
+
+alpha = 11/14
+limit alpha<gt>=0
+limit alpha<lt>=1
+
+gamma = 1/14-death
+limit gamma<gt>=0
+limit gamma<lt>=1
+
+gammaA = 1.5/14
+
+gammaIs = 1/14-deathIs
+limit gammaIs<gt>=0
+limit gammaIs<lt>=1
+
+rho = 0.05/30
+
+heathcare_capacity = beds_and_doctors-0.75*Is ;available healthcare
+limit heathcare_capacity<gt>=0
+beds_and_doctors = 50000
+
+deathIs = 0.27/14*(1-(0.5*heathcare_capacity/(1+heathcare_capacity)))
+limit deathIs<gt>=0
+limit deathIs<lt>=1
+
+death = 0.1/14  
+limit death<gt>=0
+limit death<lt>=1
+
+survival_rate1 = 1-deathI/(totI+1) ;1-cfr
+survival_rate2 = 1-14*deathIs ;survival rate of hospital admitted cases
+
+d/dt (totisolated) = iso+isoA
+init totisolated = 0
+
+ifr = deathI/(totI+1)
+cfr = dIs/(totisolated+1)
+
+d/dt (dIs) = deathIs*Is
+init dIS = 0
+
+d/dt (hospitalized) = iso
+init hospitalized = 0
+
+isolated = Is + isoAsys
+infectedless = I+Is+isoAsys
+
+limit S<gt>=0
+limit E<gt>=0
+limit I<gt>=0
+limit R<gt>=0
+limit Is<gt>=0
+limit Asys<gt>=0
+limit isoAsys<gt>=0<size>12</size>
+
+</jeditorpane>
+</jmadonna.EquationPanel>
+
+<imethod> rk4 </imethod>
+<Param> protect 0.1 </Param>
+<Param> OFW1 0.0 </Param>
+<Param> OFW 0.0 </Param>
+<Param> isolateIs 0.998 </Param>
+<Param> kit 2000.0 </Param>
+<Param> first 2.6 </Param>
+<Param> second 1.3 </Param>
+<Param> third 1.8 </Param>
+<Param> timeend 90.0 </Param>
+<Sliders>
+<SliderInfo>
+<name> first </name>
+<default> 2.6 </default>
+<min> 0.0 </min>
+<max> 6.0 </max>
+<inc> 0.1 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> second </name>
+<default> 1.3 </default>
+<min> 0.0 </min>
+<max> 3.0 </max>
+<inc> 0.1 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> third </name>
+<default> 1.8 </default>
+<min> 0.0 </min>
+<max> 3.0 </max>
+<inc> 0.1 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> timeend </name>
+<default> 90.0 </default>
+<min> 0.0 </min>
+<max> 300.0 </max>
+<inc> 1.0 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> isolateIs </name>
+<default> 0.998 </default>
+<min> 0.0 </min>
+<max> 1.0 </max>
+<inc> 0.0010 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> kit </name>
+<default> 2000.0 </default>
+<min> 0.0 </min>
+<max> 10000.0 </max>
+<inc> 10.0 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> protect </name>
+<default> 0.1 </default>
+<min> 0.0 </min>
+<max> 1.0 </max>
+<inc> 0.01 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> OFW </name>
+<default> 0.0 </default>
+<min> 0.0 </min>
+<max> 42000.0 </max>
+<inc> 2100.0 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+<SliderInfo>
+<name> OFW1 </name>
+<default> 0.0 </default>
+<min> 0.0 </min>
+<max> 21000.0 </max>
+<inc> 1000.0 </inc>
+<log> false </log>
+<neg> false </neg>
+
+</SliderInfo>
+</Sliders>
+<jmadonna.ParameterPanel>
+<DocPanel>
+</DocPanel>
+<ParamSets>
+</ParamSets>
+</jmadonna.ParameterPanel>
+<jmadonna.MultiPanel>
+<DocPanel>
+</DocPanel>
+<DividerPercent> 1.0 </DividerPercent>
+<Orientation> -1 </Orientation>
+<idx> 0 </idx>
+<TabSplitter>
+<SelectedIndex> 1 </SelectedIndex>
+<graph.COutputFrame>
+<DocPanel>
+<Name>
+Graph 1
+</Name>
+</DocPanel>
+<overlay> 1 </overlay>
+<slidersVisible> true </slidersVisible>
+
+<SingleView>
+<graph.COutputView>
+<Name> Graph </Name>
+<GraphToolBar>
+</GraphToolBar>
+<Plot>
+<LineWidth> 3 </LineWidth>
+</Plot>
+<OV_XVAR>
+<VI_SYMBOL> TIME </VI_SYMBOL>
+</OV_XVAR>
+<OV_YVARS>
+<OV_YVAR_I>
+<VI_SYMBOL> E </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> Asys </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> isoAsys </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> I </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> Is </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> deathI </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> totI </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> Infected </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> heathcare_capacity </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> survival_rate2 </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> survival_rate1 </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> ifr </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> cfr </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> isolated </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> R </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> infectedless </VI_SYMBOL>
+<VI_SHOW> true </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> totisolated </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> hospitalized </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> dIs </VI_SYMBOL>
+<VI_SHOW> true </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> trendthird </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> #confirmed </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> #deaths </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> true </VI_Y2AXIS>
+</OV_YVAR_I>
+<OV_YVAR_I>
+<VI_SYMBOL> #recovered </VI_SYMBOL>
+<VI_SHOW> false </VI_SHOW>
+<VI_Y2AXIS> false </VI_Y2AXIS>
+</OV_YVAR_I>
+</OV_YVARS>
+<OV_TABLE> false </OV_TABLE>
+<OV_FFT> false </OV_FFT>
+<OV_COLORS> true </OV_COLORS>
+<OV_STYLES> false </OV_STYLES>
+<OV_OSCMODE> false </OV_OSCMODE>
+<OV_LINES> true </OV_LINES>
+<OV_POINTS> false </OV_POINTS>
+<OV_GRID> false </OV_GRID>
+<OV_DBTN> true </OV_DBTN>
+<OV_LEGEND> false </OV_LEGEND>
+<OV_PARAMS> false </OV_PARAMS>
+<OV_READOUT> false </OV_READOUT>
+<OV_INITCOND> false </OV_INITCOND>
+<OV_RDOUTFXFY> 0.0 0.0 </OV_RDOUTFXFY>
+<OV_ZSNORMAL>
+</OV_ZSNORMAL>
+<OV_ZSFFT>
+<ZS_SIZE> 1 </ZS_SIZE>
+<ZS_I>
+<ZS_XLOG> true </ZS_XLOG>
+<ZS_Y1LOG> false </ZS_Y1LOG>
+<ZS_Y2LOG> false </ZS_Y2LOG>
+</ZS_I>
+</OV_ZSFFT>
+<OV_ZSOSCMODE>
+</OV_ZSOSCMODE>
+<OV_AUTOLABEL> 0 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 1 1 </OV_AUTOLABEL>
+<OV_AUTOLABEL> 2 1 </OV_AUTOLABEL>
+<OV_X1LABELS>  TIME </OV_X1LABELS>
+<OV_Y1LABELS>  infectedless </OV_Y1LABELS>
+<OV_Y2LABELS>  dIs </OV_Y2LABELS>
+<OV_LEGENDXY> 0.30000001192092896 0.5 </OV_LEGENDXY>
+<OV_PARAMSXY> 0.30000001192092896 0.5 </OV_PARAMSXY>
+<OV_COLORTABLE> 3 <OV_COLORTABLE>
+</graph.COutputView>
+</SingleView>
+</graph.COutputFrame>
+</TabSplitter>
+<idx> 1 </idx>
+<TabSplitter>
+<SelectedIndex> -1 </SelectedIndex>
+</TabSplitter>
+</jmadonna.MultiPanel>
+
+<CurveFitInfo>
+0.0010 0
+<OptParm>
+tau -1.0E100 1.0E100 2.5 7.5
+</OptParm>
+<FitSpec>
+#April infectedless 1.0
+</FitSpec>
+</CurveFitInfo>
+<ChemicalReactionDialog>
+<ShowRates> true </ShowRates>
+<ShowConsts> true </ShowConsts>
+<ShowInits> true </ShowInits>
+<ShowDiffs> true </ShowDiffs>
+</ChemicalReactionDialog>
+</Document>
